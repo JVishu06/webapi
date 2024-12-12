@@ -12,7 +12,7 @@ WORKDIR /src
 
 # Copy the project file and restore dependencies
 COPY ["webapi.csproj", "webapi/"]
-RUN dotnet restore "webapi/webapi.csproj"
+RUN dotnet restore "webapi.csproj"
 
 # Copy the entire source code
 COPY . .
@@ -35,7 +35,7 @@ COPY --from=publish /app/publish .
 
 # Add the certificate
 RUN mkdir -p /app/certificates
-COPY webapi/certificates/aspnetapp.pfx /app/certificates/
+COPY certificates/aspnetapp.pfx /app/certificates/
 
 # Define the entry point
 ENTRYPOINT ["dotnet", "webapi.dll"]
