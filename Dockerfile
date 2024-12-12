@@ -11,7 +11,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy the project file and restore dependencies
-COPY ["webapi/webapi.csproj", "./"]
+COPY ["webapi.csproj", "./"]
 RUN dotnet restore "webapi.csproj"
 
 # Copy the entire source code
