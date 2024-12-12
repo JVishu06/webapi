@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi.csproj": {}
+    "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi\\webapi.csproj": {}
   },
   "projects": {
-    "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi.csproj": {
+    "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi\\webapi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi.csproj",
+        "projectUniqueName": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi\\webapi.csproj",
         "projectName": "webapi",
-        "projectPath": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi.csproj",
+        "projectPath": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi\\webapi.csproj",
         "packagesPath": "C:\\Users\\roboc\\.nuget\\packages\\",
-        "outputPath": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\obj\\",
+        "outputPath": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
