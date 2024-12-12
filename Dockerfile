@@ -37,7 +37,7 @@ COPY --from=publish /app/publish .
 
 # Add the certificate
 RUN mkdir -p /app/certificates
-COPY webapi/certificates/aspnetapp.pfx /app/certificates/
+COPY certificates/aspnetapp.pfx /app/certificates/
 
 # Define the entry point
 ENTRYPOINT ["dotnet", "webapi.dll"]
