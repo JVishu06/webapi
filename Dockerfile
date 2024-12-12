@@ -11,11 +11,13 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy the project file and restore dependencies
-COPY ["webapi.csproj", "./"]
-RUN dotnet restore "webapi.csproj"
+COPY webapi/webapi.csproj ./webapi/
+RUN dotnet restore "webapi/webapi.csproj"
 
 # Copy the entire source code
-COPY . .
+COPY webapi/ ./webapi/
+
+# Set working directory to the project folder
 WORKDIR "/src/webapi"
 
 # Build the project
@@ -35,7 +37,7 @@ COPY --from=publish /app/publish .
 
 # Add the certificate
 RUN mkdir -p /app/certificates
-COPY certificates/aspnetapp.pfx /app/certificates/
+COPY webapi/certificates/aspnetapp.pfx /app/certificates/
 
 # Define the entry point
 ENTRYPOINT ["dotnet", "webapi.dll"]
