@@ -2,9 +2,9 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 80
 EXPOSE 443
-EXPOSE 10000
+
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -39,3 +39,8 @@ COPY certificates/aspnetapp.pfx /app/certificates/
 
 # Define the entry point
 ENTRYPOINT ["dotnet", "webapi.dll"]
+
+# Set environment variables for Kestrel SSL
+ENV ASPNETCORE_HTTPS_PORT=443
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/app/certificates/aspnetapp.pfx"
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password="weather"
