@@ -33,12 +33,12 @@ builder.Services.AddSwaggerGen(option =>
     option.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-// Configure CORS to allow requests from the frontend
+// Temporarily allow all origins for debugging CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin", builder =>
+    options.AddPolicy("AllowAll", builder =>
     {
-        builder.WithOrigins("https://localhost:7195")  // Frontend URL for local dev
+        builder.AllowAnyOrigin()   // Allow any origin for now
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -54,7 +54,7 @@ var app = builder.Build();
 app.MapIdentityApi<IdentityUser>();
 
 // Use CORS policy
-app.UseCors("AllowSpecificOrigin");
+app.UseCors("AllowAll");
 
 // Use Swagger in Development environment
 if (app.Environment.IsDevelopment())
@@ -67,6 +67,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add a simple health check endpoint
+app.MapGet("/api/HealthCheck", () => Results.Ok("API is running"));
 
 // Map controllers for handling HTTP requests
 app.MapControllers();
