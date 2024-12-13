@@ -4,7 +4,7 @@ USER app
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
-
+EXPOSE 10000
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
