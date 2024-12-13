@@ -49,7 +49,7 @@ builder.Services.AddSingleton<MongoWeatherService>();
 
 // Build the application
 var app = builder.Build();
-app.UseUrls("http://0.0.0.0:8080");
+
 // Use Identity API endpoints
 app.MapIdentityApi<IdentityUser>();
 
