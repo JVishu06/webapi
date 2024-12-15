@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", corsBuilder =>
     {
-        corsBuilder.AllowAnyOrigin()
+        corsBuilder.WithOrigins("https://jvishwa06.github.io") // Add your GitHub Pages URL
                    .AllowAnyMethod()
                    .AllowAnyHeader();
     });
