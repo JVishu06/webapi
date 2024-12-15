@@ -1,41 +1,29 @@
-# Base image for the application
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-# Build stage
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+
+
+# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-# Copy the project file and restore dependencies
-COPY ["webapi.csproj", "./"]
-RUN dotnet restore "webapi.csproj"
-
-# Copy the entire source code
+COPY ["webapi/webapi.csproj", "webapi/"]
+RUN dotnet restore "./webapi/webapi.csproj"
 COPY . .
-WORKDIR "/src"
+WORKDIR "/src/webapi"
+RUN dotnet build "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Build the project
-RUN dotnet build "webapi.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# Publish stage
+# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./webapi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Final image
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
-
-# Copy published output to the final image
 COPY --from=publish /app/publish .
-
-# Add the certificate
-RUN mkdir -p /app/certificates
-COPY certificates/aspnetapp.pfx /app/certificates/
-
-# Define the entry point
 ENTRYPOINT ["dotnet", "webapi.dll"]

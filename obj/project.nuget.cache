@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KHunWEWEDfo=",
+  "dgSpecHash": "XfxaNsikvB8=",
   "success": true,
-  "projectFilePath": "V:\\ARTIFICIAL-INTELLIGENCE-Projects\\webapi\\webapi.csproj",
+  "projectFilePath": "V:\\ARTIFICIAL-INTELLIGENCE(DON'TDELETE)\\webapi\\webapi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\roboc\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\roboc\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",

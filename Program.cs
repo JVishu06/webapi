@@ -11,59 +11,73 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("idenitycs")));
 
+// Configure Identity with API endpoints and role management
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<IdentityDbContext>();
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().
-    AddRoles<IdentityRole>().
-    AddEntityFrameworkStores<IdentityDbContext>();
-
+// Dependency injection for role service
 builder.Services.AddScoped<IRoleService, RoleService>();
 
-builder.Services.AddControllers();
+// Configure Swagger/OpenAPI with security definition
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(option =>
+builder.Services.AddSwaggerGen(options =>
 {
-    option.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        In = ParameterLocation.Header,
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.ApiKey,
+        Description = "Enter 'Bearer {your token}'"
     });
-    option.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
+// Add CORS policy for allowing all origins, methods, and headers
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", corsBuilder =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        corsBuilder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
     });
 });
 
+// MongoDB service for weather-related operations
 builder.Services.AddSingleton<MongoWeatherService>();
 
+// Add controllers
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-
+// Map Identity API endpoints
 app.MapIdentityApi<IdentityUser>();
 
+// Use CORS policy
 app.UseCors("AllowAll");
-if (app.Environment.IsDevelopment())
+
+// Enable Swagger in all environments, with appropriate URL prefix for production
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather API v1");
+        options.RoutePrefix = "swagger"; // Access Swagger at /swagger
+    });
 }
 
+// Middleware for HTTPS redirection
 app.UseHttpsRedirection();
+
+// Middleware for authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map controller routes
 app.MapControllers();
 
+// Run the application
 app.Run();
-
-
-
