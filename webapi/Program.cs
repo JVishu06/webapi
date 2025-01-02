@@ -36,11 +36,12 @@ builder.Services.AddSwaggerGen(options =>
 // Add CORS policy for allowing all origins, methods, and headers
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", corsBuilder =>
+    options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        corsBuilder.AllowAnyOrigin() // Add your GitHub Pages URL
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
+        builder.WithOrigins("https://webapi-8j7b.onrender.com")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
     });
 });
 
