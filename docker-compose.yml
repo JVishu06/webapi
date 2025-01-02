@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  webapi:
+    build:
+      context: ./webapi
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__idenitycs=Server=sqlserver;Database=idenityapidb;User Id=sa;Password=vishu06;
+      - MongoDB__ConnectionString=mongodb://mongodb:27017
+      - MongoDB__Database=WeatherApplicationDB
+    depends_on:
+      - sqlserver
+      - mongodb
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "vishu06"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodbdata:/data/db
+
+volumes:
+  sqlserverdata:
+  mongodbdata:
