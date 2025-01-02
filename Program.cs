@@ -7,69 +7,61 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Database configuration
-builder.Services.AddDbContext<IdentityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
+builder.Services.AddDbContext<IdentityDbContext>(option =>
+option.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
 
-// Identity configuration
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<IdentityDbContext>()
-    .AddDefaultTokenProviders();
 
-// Role service registration
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().
+    AddRoles<IdentityRole>().
+    AddEntityFrameworkStores<IdentityDbContext>();
+
 builder.Services.AddScoped<IRoleService, RoleService>();
 
-// Add controllers
 builder.Services.AddControllers();
-
-// Swagger configuration for API documentation
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(option =>
 {
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    option.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "Standard Authorization header using the Bearer scheme (\"Bearer {token}\")",
-        In = ParameterLocation.Header,
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
     });
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
+    option.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-// CORS policy configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", policy =>
+    options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        policy.WithOrigins("https://wasm-8j7b.onrender.com")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        builder.WithOrigins("https://your-wasm-app-url")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
     });
 });
 
-// MongoDB WeatherService registration
 builder.Services.AddSingleton<MongoWeatherService>();
 
-// Authentication & Authorization
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Middleware pipeline
+
+app.MapIdentityApi<IdentityUser>();
+
+app.UseCors("AllowAll");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowSpecificOrigins");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapIdentityApi<IdentityUser>();
 
 app.Run();
