@@ -7,35 +7,37 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Use a secure connection string for production (store it in environment variables or a secrets manager)
 builder.Services.AddDbContext<IdentityDbContext>(option =>
-option.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
+    option.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
 
-
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().
-    AddRoles<IdentityRole>().
-    AddEntityFrameworkStores<IdentityDbContext>();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<IdentityDbContext>();
 
 builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
-    option.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    option.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        In = OpenApiParameterLocation.Header,
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
     });
     option.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
+// Define a CORS policy to allow specific origins in production
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("https://your-wasm-app-url")
+        builder.WithOrigins("https://wasm-ilwk.onrender.com") // Replace with actual production frontend URL
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
@@ -48,17 +50,25 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-
+// Map identity API endpoints
 app.MapIdentityApi<IdentityUser>();
 
-app.UseCors("AllowAll");
+// Enable CORS policy in production
+app.UseCors("AllowSpecificOrigins");
+
 if (app.Environment.IsDevelopment())
 {
+    // Enable Swagger only in development
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    // Disable Swagger UI in production
+    // Configure HTTPS redirection and authentication
+    app.UseHttpsRedirection(); // Ensure that the server handles HTTPS in production
+}
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
