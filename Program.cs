@@ -41,7 +41,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.WithOrigins("https://wasm-ilwk.onrender.com") // Replace with actual frontend URL
+        policy.WithOrigins("https://wasm-ilwk.onrender.com"
+        ,"https://localhost:7195") // Replace with actual frontend URL
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
