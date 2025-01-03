@@ -7,71 +7,71 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Use a secure connection string for production (store it in environment variables or a secrets manager)
-builder.Services.AddDbContext<IdentityDbContext>(option =>
-    option.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
+// Configure Database
+builder.Services.AddDbContext<IdentityDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
 
+// Configure Identity
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<IdentityDbContext>();
 
+// Add Custom Services
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddSingleton<MongoWeatherService>();
 
+// Add Controllers
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(option =>
+builder.Services.AddSwaggerGen(options =>
 {
-    option.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         In = OpenApiParameterLocation.Header,
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
     });
-    option.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-// Define a CORS policy to allow specific origins in production
+// Configure CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", builder =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        builder.WithOrigins("https://wasm-ilwk.onrender.com") // Replace with actual production frontend URL
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
+        policy.WithOrigins("https://wasm-ilwk.onrender.com") // Replace with actual frontend URL
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
-builder.Services.AddSingleton<MongoWeatherService>();
-
-builder.Services.AddControllers();
-
 var app = builder.Build();
 
-// Map identity API endpoints
-app.MapIdentityApi<IdentityUser>();
-
-// Enable CORS policy in production
-app.UseCors("AllowSpecificOrigins");
-
+// Configure Middleware
 if (app.Environment.IsDevelopment())
 {
-    // Enable Swagger only in development
+    // Enable Swagger for development
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 else
 {
-    // Disable Swagger UI in production
-    // Configure HTTPS redirection and authentication
-    app.UseHttpsRedirection(); // Ensure that the server handles HTTPS in production
+    // Configure for production
+    app.UseHttpsRedirection(); // Ensure HTTPS is enforced
 }
 
+// Enable CORS
+app.UseCors("AllowSpecificOrigins");
+
+// Configure Authentication and Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map Endpoints
+app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 
 app.Run();
