@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,15 +24,17 @@ builder.Services.AddSingleton<MongoWeatherService>();
 // Add Controllers
 builder.Services.AddControllers();
 
-// Configure Swagger/OpenAPI
+// Configure Swagger/OpenAPI for JWT
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = OpenApiParameterLocation.Header,
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.ApiKey,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
@@ -41,13 +44,20 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
     {
-        policy.WithOrigins("https://wasm-ilwk.onrender.com"
-        ,"https://localhost:7195") // Replace with actual frontend URL
+        policy.WithOrigins("https://wasm-ilwk.onrender.com", "https://localhost:7195")
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowCredentials(); // Enable credentials if needed
     });
 });
+
+// Configure Authentication for JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://your-identity-server-url";  // Update with your Identity URL
+        options.Audience = "api1";  // Specify your API's audience
+    });
 
 var app = builder.Build();
 
