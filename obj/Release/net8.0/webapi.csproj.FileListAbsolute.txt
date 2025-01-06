@@ -1,8 +1,0 @@
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.csproj.AssemblyReference.cache
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.GeneratedMSBuildEditorConfig.editorconfig
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.AssemblyInfoInputs.cache
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.AssemblyInfo.cs
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.csproj.CoreCompileInputs.cache
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.MvcApplicationPartsAssemblyInfo.cs
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.MvcApplicationPartsAssemblyInfo.cache
-E:\VISHWA\WeatherApplicationwithJWTAuthentication\webapi\obj\Release\net8.0\webapi.sourcelink.json

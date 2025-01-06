@@ -12,7 +12,8 @@ public class MongoWeatherService
     // Constructor to initialize MongoDB connection and collections
     public MongoWeatherService()
     {
-        var client = new MongoClient("mongodb://localhost:27017"); // MongoDB connection string
+        var connectionString = "mongodb+srv://jvishuai:Jvishu06@weatherv0.zh8io.mongodb.net/WeatherApplicationDB?retryWrites=true&w=majority";
+        var client = new MongoClient(connectionString); // MongoDB Atlas connection
         var database = client.GetDatabase("WeatherApplicationDB");
         _weatherCollection = database.GetCollection<BsonDocument>("WeatherApplicationData");
         _favoritesCollection = database.GetCollection<BsonDocument>("FavoriteCities"); // New collection for favorites

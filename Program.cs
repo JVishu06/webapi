@@ -4,85 +4,80 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Database
+// Configure PostgreSQL connection
 builder.Services.AddDbContext<IdentityDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("idenitycs")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("idenitycs")));
 
-// Configure Identity
+// Configure Identity with API endpoints and role management
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<IdentityDbContext>();
 
-// Add Custom Services
+// Dependency injection for role service
 builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddSingleton<MongoWeatherService>();
 
-// Add Controllers
-builder.Services.AddControllers();
-
-// Configure Swagger/OpenAPI for JWT
+// Configure Swagger/OpenAPI with security definition
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        In = OpenApiParameterLocation.Header,
+        In = ParameterLocation.Header,
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
+        Description = "Enter 'Bearer {your token}'"
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-// Configure CORS
+// Add CORS policy for allowing all origins, methods, and headers
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigins", policy =>
+    options.AddPolicy("AllowAll", corsBuilder =>
     {
-        policy.WithOrigins("https://wasm-ilwk.onrender.com", "https://localhost:7195")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // Enable credentials if needed
+        corsBuilder.AllowAnyOrigin() // Add your GitHub Pages URL
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
     });
 });
 
-// Configure Authentication for JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://your-identity-server-url";  // Update with your Identity URL
-        options.Audience = "api1";  // Specify your API's audience
-    });
+// MongoDB service for weather-related operations
+builder.Services.AddSingleton<MongoWeatherService>();
+
+// Add controllers
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure Middleware
-if (app.Environment.IsDevelopment())
+// Map Identity API endpoints
+app.MapIdentityApi<IdentityUser>();
+
+// Use CORS policy
+app.UseCors("AllowAll");
+
+// Enable Swagger in all environments, with appropriate URL prefix for production
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
-    // Enable Swagger for development
     app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    // Configure for production
-    app.UseHttpsRedirection(); // Ensure HTTPS is enforced
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Weather API v1");
+        options.RoutePrefix = "swagger"; // Access Swagger at /swagger
+    });
 }
 
-// Enable CORS
-app.UseCors("AllowSpecificOrigins");
+// Middleware for HTTPS redirection
+app.UseHttpsRedirection();
 
-// Configure Authentication and Authorization
+// Middleware for authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map Endpoints
-app.MapIdentityApi<IdentityUser>();
+// Map controller routes
 app.MapControllers();
 
+// Run the application
 app.Run();

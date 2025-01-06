@@ -38,10 +38,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
+<<<<<<< HEAD
         builder.WithOrigins("https://wasm-ilwk.onrender.com")
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
+=======
+        corsBuilder.WithOrigins("https://jvishu06.github.io") // Add your GitHub Pages URL
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+>>>>>>> parent of ff09a8f (Update Program.cs)
     });
 });
 
